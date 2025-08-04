@@ -1,0 +1,271 @@
+{
+    "port": 9001,
+
+    "server_name": "potato annotator",
+
+    "annotation_task_name": "News value of science",
+
+    # Potato will write the annotation file for all annotations to this
+    # directory, as well as per-annotator output files and state information
+    # necessary to restart annotation.
+    "output_annotation_dir": "annotation_output/full/batch_3/news/",
+
+    # The output format for the all-annotator data. Allowed formats are:
+    # * jsonl
+    # * json (same output as jsonl)
+    # * csv
+    # * tsv
+    #
+    "output_annotation_format": "tsv",
+
+    # If annotators are using a codebook, this will be linked at the top to the
+    # instance for easy access
+    "annotation_codebook_url": "",
+
+    "data_files": [
+       "data_files/news_pair_sample_1000_batch2.csv"
+    ],
+
+    "item_properties": {
+        "id_key": "id",
+        "text_key": "text",
+    },
+
+
+    "user_config": {
+
+      "allow_all_users": True,
+
+      "users": [  ],
+    },
+
+    #defining the ways annotators entering the annotation system
+    "login": {
+       "type": 'url_direct',    #can be 'password' or 'url_direct'
+       "url_argument": 'PROLIFIC_PID' # when the login type is set to 'url_direct', 'url_argument' must be setup for a direct url argument login
+    },
+
+    #the jumping-to-id function will be disabled if "jumping_to_id_disabled" is True
+    "jumping_to_id_disabled": True,
+
+  #the navigation bar will be hidden to the annotators if "hide_navbar" is True
+    "hide_navbar": True,
+
+  # define the surveyflow of the system, set up the pages before and after the data annotation page
+    "surveyflow": {
+      "on": True,
+      #"order" : ['pre_annotation', 'prestudy_passed', 'prestudy_failed', 'post_annotation'],
+      "order" : ['pre_annotation', 'post_annotation'],
+      "pre_annotation": [
+                        {'file':'surveyflow/intro.jsonl','text':'Overview of the task'},
+                        {"file": 'surveyflow/instruction.jsonl', "text": "Please read the following instructions"},
+                        {"file": 'surveyflow/consent.jsonl', "text": "Please answer the following consent questions"}],
+      "post_annotation": [
+                        {"file": 'surveyflow/demographic_information.jsonl', "text": "Please share your background information"},
+                        {"file": 'surveyflow/experience_with_science.jsonl', "text": "Please share your experience with science"},
+                        {"file": 'surveyflow/political_orientation.jsonl', "text": "Please answer the following questions about your views on society and the role of government"},
+                        {"file": 'surveyflow/experience.jsonl', "text": "Please share your experience today!"},
+                        {"file": 'surveyflow/end.jsonl', "text": "Congratulations! You have completed all the tasks!"}],
+                          # If set, we will automatically generate testing questions similar to the annotation instances, but explicitly ask the annotator to choose one option
+      "testing": ['surveyflow/testing.jsonl'],
+    },
+
+    #prestudy test, annotators who fail this test will be disalloed to continue annotation
+    "prestudy": {
+        "on": False,
+        "minimum_score": 0.8,
+        "groundtruth_key": 'whether_match',
+        "question_key": 'Whether the presented sentences are discussing the same scientific finding',
+        "answer_mapping": {'Yes': True, 'No': False},
+        "pass_page": 'surveyflow/prestudy_pass.jsonl',
+        "fail_page": 'surveyflow/prestudy_fail.jsonl'
+    },
+
+
+    "automatic_assignment": {
+      #whether do automatic task assignment for annotators, default False.
+      "on": True,
+      "output_filename": 'task_assignment.json',
+      "sampling_strategy": 'random',
+      "labels_per_instance": 8,
+      "instance_per_annotator": 5,
+      "test_question_per_annotator": 0, # you must set up the test question in surveyflow to use this function
+
+      "users": [  ],
+    },
+
+
+    # How many seconds do you want the annotators spend on each instance, after
+    # that, an alert will be sent per alert_time_each_instance seconds.
+    "alert_time_each_instance": 10000000,
+    "horizontal_key_bindings": true,
+
+    "annotation_schemes": [
+      {
+        "annotation_type": "multirate",
+
+        # This name gets used in reporting the annotation results
+        "name": "Readability and newsworthiness",
+
+        # This text is shown to the user and can be a longer statement
+        "description": "Readability and newsworthiness",
+
+        "display_config": {
+                            "num_columns":1
+        },
+
+        "arrangement":'vertical',
+
+        "options": ['I can understand the science news story', 'Understanding the science news story requires specialized knowledge', 'The science news story sounds interesting to me', 'The science news story is fun to read', 'The science news story could be interesting to the general public',
+                     'The science news story should be published in the news', 'The science news story tackles an important issue'],
+        "labels": ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree' , 'Strongly Agree'],
+
+        # adding requirements for labels, when "required" is True, the annotators will be asked to finish the current instance to proceed
+        "label_requirement": { "required": True },
+
+        # If true, keys [1-size] will be bound to scale responses. Likert
+        # scales larger than 10 are not supported with this simple
+        # keybinding and will need to use the full item specification to
+        # bind all scale points to keys.
+        "sequential_key_binding": False,
+      },
+
+      {
+        "annotation_type": "multirate",
+
+        # This name gets used in reporting the annotation results
+        "name": "Practical implications and controversy",
+
+        # This text is shown to the user and can be a longer statement
+        "description": "Practical implications and controversy",
+
+        "display_config": {
+          "num_columns": 1
+        },
+
+        "arrangement": 'vertical',
+
+        "options": ['I learned something useful from the science news story', 'Knowing about this science could benefit a lot of people', 'The scientific finding seems surprising to me','The scientific finding could be controversial', 'This science news story is overstated or exaggerated'],
+        "labels": [ 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' , 'Strongly Agree'],
+
+        # adding requirements for labels, when "required" is True, the annotators will be asked to finish the current instance to proceed
+        "label_requirement": { "required": True },
+
+        # If true, keys [1-size] will be bound to scale responses. Likert
+        # scales larger than 10 are not supported with this simple
+        # keybinding and will need to use the full item specification to
+        # bind all scale points to keys.
+        "sequential_key_binding": False,
+      },
+
+      {
+        "annotation_type": "multirate",
+
+        # This name gets used in reporting the annotation results
+        "name": "Sharing",
+
+        # This text is shown to the user and can be a longer statement
+        "description": "Sharing",
+
+        "display_config": {
+          "num_columns": 1
+        },
+
+        "arrangement": 'vertical',
+
+        "options": [ 'I would share this science news story with someone I know directly', 'I would share this science news story with a wider forum like a mailing list, twitter, reddit', 'I would be unlikely to share this science news story with anyone'],
+        "labels": [ 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' , 'Strongly Agree' ],
+
+        # adding requirements for labels, when "required" is True, the annotators will be asked to finish the current instance to proceed
+        "label_requirement": { "required": True },
+
+        # If true, keys [1-size] will be bound to scale responses. Likert
+        # scales larger than 10 are not supported with this simple
+        # keybinding and will need to use the full item specification to
+        # bind all scale points to keys.
+        "sequential_key_binding": False,
+      },
+
+      {
+        "annotation_type": "multirate",
+
+        # This name gets used in reporting the annotation results
+        "name": "benefit",
+
+        # This text is shown to the user and can be a longer statement
+        "description": "Who will benefit from learning about this finding?",
+
+        "display_config": {
+          "num_columns": 1
+        },
+
+        "arrangement": 'vertical',
+
+        "options": [ 'The general public', 'A segment of the public', 'Policy makers', 'Companies in the related industries'],
+        "labels": [ 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' , 'Strongly Agree' ],
+
+        # adding requirements for labels, when "required" is True, the annotators will be asked to finish the current instance to proceed
+        "label_requirement": { "required": True },
+
+        # If true, keys [1-size] will be bound to scale responses. Likert
+        # scales larger than 10 are not supported with this simple
+        # keybinding and will need to use the full item specification to
+        # bind all scale points to keys.
+        "sequential_key_binding": False,
+      },
+
+      {
+        "annotation_type": "multirate",
+
+        # This name gets used in reporting the annotation results
+        "name": "publishing",
+
+        # This text is shown to the user and can be a longer statement
+        "description": "If I'm browsing news articles from __, I would be likely to read the science news story above",
+
+        "display_config": {
+          "num_columns": 1
+        },
+
+        "arrangement": 'vertical',
+
+        "options": [ 'General news outlets (e.g. BBC, New York Times, Fox News)', 'Science and Technology media (e.g. Scientific American, National Geographic)', 'Other popular print media (e.g. Vogue, GQ, Elle, People, Time and Reader’s Digest)', 'Other popular media (e.g. TV and radio)', 'My normal feed/content/timeline on a social media site (e.g. Facebook, Instagram and Twitter)', 'It should not be published in public media outside the science community' ],
+        "labels": [ 'Strongly Disagree', 'Disagree', 'Neutral', 'Agree' , 'Strongly Agree' ],
+
+        # adding requirements for labels, when "required" is True, the annotators will be asked to finish the current instance to proceed
+        "label_requirement": { "required": True },
+
+        # If true, keys [1-size] will be bound to scale responses. Likert
+        # scales larger than 10 are not supported with this simple
+        # keybinding and will need to use the full item specification to
+        # bind all scale points to keys.
+        "sequential_key_binding": False,
+      },
+
+
+
+
+    ],
+
+    # The html that changes the visualiztation for your task. Change this file
+    # to influence the layout and description of your task. This is not a full
+    # HTML page, just the piece that does lays out your task's pieces
+    #"html_layout": "templates/examples/fixed_keybinding_layout.html",
+    "html_layout": "templates/layout.html",
+
+    # The core UI files for Potato. You should not need to change these normally.
+    #
+    # Exceptions to this might include:
+    # 1) You want to add custom CSS/fonts to style your task
+    # 2) Your layout requires additional JS/assets to render
+    # 3) You want to support additional keybinding magic
+    #
+    # if you want to use your own template,
+    # please replace the string as a path to the template
+    "base_html_template": "templates/base.html",
+    "header_file": "templates/header.html",
+
+    # This is where the actual HTML files will be generated
+    "site_dir": "default"
+
+}
